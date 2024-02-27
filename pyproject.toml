@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "group-project"
+version = "0.1.0"
+description = "MSC Group Project Submission"
+authors = ["Aradhya Tripathi <67282231+Aradhya-Tripathi@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+paramiko = "^3.4.0"
+rich = "^13.7.0"
+pyperclip = "^1.8.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
