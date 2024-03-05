@@ -13,11 +13,14 @@ class Connection:
         self,
         hostname: str = None,
         password: str = None,
+        timeout: None | int = None,
     ) -> None:
         """Run setup and trigger remote colab connection also supports existing hostname and password
         to cater for existing ssh connections.
         """
+        self.timeout = timeout
         self.setup = self.run_setup()
+
         if not hostname and not password:
             self.hostname, self.password = guide()
         else:
@@ -47,9 +50,11 @@ class Connection:
                         "%h", self.hostname
                     )  # This replace is required by pramiko
                 ),
+                timeout=self.timeout,
             )
         except SSHException:
-            print("FAILURE!")
+            setup_console.print_exception()
+            exit()
 
         setup_console.print(f"\n[green]Connected to {self.hostname} successfully!")
 
@@ -64,4 +69,5 @@ if __name__ == "__main__":
     Connection(
         hostname="practitioner-books-render-villages.trycloudflare.com",
         password="123",
+        timeout=1,
     )
