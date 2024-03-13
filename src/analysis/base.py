@@ -39,4 +39,4 @@ class Analyse:
 
 
 if __name__ == "__main__":
-    Analyse("./results").get_plot_files()
+    Analyse("./src/results").get_plot_files()

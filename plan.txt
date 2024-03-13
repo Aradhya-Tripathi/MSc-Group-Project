@@ -1,0 +1,5 @@
+* Flask to take in requests for predictions
+* Since this is a desktop app we don't need to worry much about spamming and stuff like that
+* Use celery to schedule tasks and redis as the message broker and results backend
+* Once the results are ready we can show them; I think polling would be decent in this
+senario since it's a local server that I run.

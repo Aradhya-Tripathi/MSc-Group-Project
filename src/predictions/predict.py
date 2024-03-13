@@ -1,5 +1,4 @@
 import os
-import warnings
 from pathlib import Path
 
 from colabfold.batch import run
@@ -18,12 +17,12 @@ class Predict:
         path_to_results_dir: str = ".",
     ) -> None:
         self.queries, self.is_complex = Input.setup(path_to_input=path_to_input)
-        self.path_to_params = path_to_params
-        self.path_to_results_dir = path_to_results_dir
+        self.path_to_params = Path(path_to_params)
+        self.path_to_results_dir = Path(path_to_results_dir)
         self.model_type = Model.setup(self.is_complex, model_type)
 
-        if self.check_existing_params():
-            warnings.warn(f"Could not find params at {self.path_to_params}")
+        if not self.check_existing_params():
+            print(f"Could not find params at {self.path_to_params.absolute()}")
             download = input("Do you want to download params? y/N: ")
             if download.casefold() == "y":
                 download_alphafold_params(
@@ -37,7 +36,7 @@ class Predict:
         Check if pre-trained model exists
         """
         if self.path_to_params:
-            return os.path.exists(Path(self.path_to_params).absolute())
+            return os.path.exists(self.path_to_params.absolute())
         return False
 
     def run(self, **kwargs) -> dict[str, list]:

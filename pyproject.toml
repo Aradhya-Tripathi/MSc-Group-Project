@@ -7,13 +7,10 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9, <3.12"
-paramiko = "^3.4.0"
-pyperclip = "^1.8.2"
-jax = "0.4.20"
-jaxlib = "0.4.20"
-colabfold = {extras = ["alphafold"], version = "^1.5.5"}
-
+python = ">=3.11,<3.12"
+colabfold = {git = "https://github.com/sokrypton/ColabFold.git", rev = "2dca108", extras = ["alphafold"]}
+flask = "^3.0.2"
+celery = {extras = ["redis"], version = "^5.3.6"}
 
 
 [build-system]
