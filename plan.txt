@@ -3,3 +3,6 @@
 * Use celery to schedule tasks and redis as the message broker and results backend
 * Once the results are ready we can show them; I think polling would be decent in this
 senario since it's a local server that I run.
+
+
+* Barkla scripts: module load apps/anaconda3/2023.03-poetry

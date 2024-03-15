@@ -7,10 +7,11 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
+python = ">=3.10,<3.12"
 colabfold = {git = "https://github.com/sokrypton/ColabFold.git", rev = "2dca108", extras = ["alphafold"]}
 flask = "^3.0.2"
 celery = {extras = ["redis"], version = "^5.3.6"}
+requests = "^2.31.0"
 
 
 [build-system]

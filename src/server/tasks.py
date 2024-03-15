@@ -1,15 +1,19 @@
-from config import create_app  # -Line 1
 from celery import shared_task
-from time import sleep
 
-flask_app = create_app()  # -Line 2
-celery_app = flask_app.extensions["celery"]  # -Line 3
+from predictions.predict import Predict
+
+from .config import create_app
+
+flask_app = create_app()
+celery_app = flask_app.extensions["celery"]
 
 
-@shared_task(ignore_result=False)  # -Line 4
-def long_running_task(iterations) -> int:  # -Line 5
-    result = 0
-    for i in range(iterations):
-        result += i
-        sleep(2)
-    return result  # -Line 6
+@shared_task(ignore_result=False)
+def run_predictions(
+    path_to_input: str, path_to_params: str, path_to_results_dir: str
+) -> None:
+    Predict(
+        path_to_input=path_to_input,
+        path_to_params=path_to_params,
+        path_to_results_dir=path_to_results_dir,
+    ).run()

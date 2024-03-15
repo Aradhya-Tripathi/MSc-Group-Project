@@ -31,6 +31,10 @@ class Predict:
             else:
                 exit()
 
+        print(
+            f"[READY TO PREDICT] using parameters: {self.path_to_params.absolute()} to predict: {path_to_input}"
+        )
+
     def check_existing_params(self) -> bool:
         """
         Check if pre-trained model exists
@@ -55,5 +59,5 @@ class Predict:
             data_dir=self.path_to_params,
             *kwargs,
         )
-        print("Finished runnign model")
+        print("Finished running model")
         return results
