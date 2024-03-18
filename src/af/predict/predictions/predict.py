@@ -1,11 +1,20 @@
 import os
 from pathlib import Path
 
-from colabfold.batch import run
+from colabfold.batch import get_queries, run, set_model_type
 from colabfold.download import download_alphafold_params
 
-from model import Model
-from model_input import Input
+
+class Model:
+    @classmethod
+    def setup(cls, is_complex: bool = False, model_type: str = "auto"):
+        return set_model_type(is_complex, model_type)
+
+
+class Input:
+    @classmethod
+    def setup(cls, path_to_input: str):
+        return get_queries(path_to_input)
 
 
 class Predict:
@@ -61,3 +70,10 @@ class Predict:
         )
         print("Finished running model")
         return results
+
+    def test_run(self):
+        print("Run started!")
+        import time
+
+        time.sleep(10)
+        return "Job Completed"
