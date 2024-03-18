@@ -13,6 +13,14 @@ def af_predictions():
     ).run()
 
 
+@shared_task
+def test_af_predictions() -> bool:
+    import time
+
+    time.sleep(30)
+    return True
+
+
 # ref: https://github.com/celery/celery/issues/6036
 os.environ["FORKED_BY_MULTIPROCESSING"] = "1"
 if os.name != "nt":

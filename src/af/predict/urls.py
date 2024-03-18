@@ -4,5 +4,6 @@ from .views import trigger, result
 
 urlpatterns = [
     path("trigger", trigger),
-    path("result/<str:id>", result),
+    path("result/<str:job_id>", result),
+    path("result", result),
 ]

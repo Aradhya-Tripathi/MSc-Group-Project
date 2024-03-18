@@ -1,5 +1,12 @@
+import QueryInput from "./components/QueryInput";
+
 function App() {
-  return <h1 className="text-black text-center text-3xl">Hello World!</h1>;
+  return (
+    <div className="flex flex-col items-center h-screen w-screen bg-black">
+      <header className="text-white text-2xl mt-3">AF Predictions</header>
+      <QueryInput />
+    </div>
+  );
 }
 
 export default App;

@@ -1,3 +1,3 @@
 cd af
 
-celery -A core --pool=prefork worker
+celery -A core worker --pool=prefork --loglevel=INFO -n AF-Predictions -Q AF-Predictions-Queue
