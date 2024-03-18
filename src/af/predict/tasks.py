@@ -13,6 +13,7 @@ def af_predictions():
     ).run()
 
 
+# ref: https://github.com/celery/celery/issues/6036
 os.environ["FORKED_BY_MULTIPROCESSING"] = "1"
 if os.name != "nt":
     from billiard import context

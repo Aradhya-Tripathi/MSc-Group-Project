@@ -1,3 +1,3 @@
 cd af
 
-celery -A core worker
+celery -A core --pool=prefork worker
