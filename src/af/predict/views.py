@@ -46,7 +46,4 @@ def result(_: "Request", job_id: str = None) -> JsonResponse:
             celery_handler.control.inspect().reserved().get("celery@AF-Predictions")
         )
 
-    return JsonResponse(
-        {"tasks": res},
-        status=200,
-    )
+    return JsonResponse({"tasks": res}, status=200)

@@ -17,7 +17,7 @@ def af_predictions():
 def test_af_predictions() -> bool:
     import time
 
-    time.sleep(30)
+    time.sleep(300)
     return True
 
 
