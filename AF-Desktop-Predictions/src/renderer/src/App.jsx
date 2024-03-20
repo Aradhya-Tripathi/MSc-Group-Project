@@ -7,6 +7,16 @@ function App() {
   // Todo: https://www.bugpilot.com/guides/en/building-a-chat-application-with-react-and-django-channels-0120
   // to show changes in the prediction state.
   const [queue, setQueue] = useState([])
+  // Gracefully close socket on window close!
+  const sigalsWebsocket = new WebSocket('ws://localhost:8000/ws/signals')
+
+  sigalsWebsocket.onopen = () => {
+    sigalsWebsocket.send(JSON.stringify({ name: 'Connection Established' }))
+  }
+
+  sigalsWebsocket.onmessage = (e) => {
+    console.log(e.data)
+  }
 
   const enqueuePrediction = () => {
     api.get('result').then((res) => {
@@ -14,32 +24,26 @@ function App() {
         console.log('Not executing shit since we have 2 predictions in queue already!')
       } else {
         api.post('trigger').then((res) => {
-          // console.log(res.data) // Queue Id
-          // show some saying it's queued
-          updateQueue()
+          // updateQueue()
         })
       }
     })
   }
 
-  const updateQueue = () => {
-    api
-      .get('/result')
-      .then((res) => {
-        if (res.data.tasks != null) {
-          setQueue(res.data.tasks)
-        } else {
-          setQueue([]) // just in case
-        }
-      })
-      .catch((err) => {
-        console.log('Error occured!')
-      })
-  }
-
-  useEffect(() => {
-    updateQueue()
-  }, [])
+  // const updateQueue = () => {
+  //   api
+  //     .get('/result')
+  //     .then((res) => {
+  //       if (res.data.tasks != null) {
+  //         setQueue(res.data.tasks)
+  //       } else {
+  //         setQueue([]) // just in case
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log('Error occured!')
+  //     })
+  // }
 
   return (
     <div className="flex flex-col h-screen w-screen items-center bg-main-background">

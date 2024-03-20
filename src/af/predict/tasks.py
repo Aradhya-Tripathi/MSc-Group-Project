@@ -1,8 +1,36 @@
 import os
 
 from celery import shared_task
-
+from celery.signals import task_prerun, task_success
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from .predictions.predict import Predict
+
+
+@task_prerun.connect
+def task_prerun_handler(sender=None, **kargs) -> None:
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "singals",
+        {
+            "type": "singals.event",
+            "taskId": f"{sender.request.id}",
+            "status": "starting",
+        },
+    )
+
+
+@task_success.connect
+def task_success_handler(sender=None, **kwargs) -> None:
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "singals",
+        {
+            "type": "singals.event",
+            "taskId": f"{sender.request.id}",
+            "status": "successful",
+        },
+    )
 
 
 @shared_task
@@ -17,7 +45,7 @@ def af_predictions():
 def test_af_predictions() -> bool:
     import time
 
-    time.sleep(300)
+    time.sleep(3)
     return True
 
 
