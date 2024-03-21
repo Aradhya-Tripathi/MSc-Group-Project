@@ -11,11 +11,11 @@ from .predictions.predict import Predict
 def task_prerun_handler(sender=None, **kargs) -> None:
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        "singals",
+        "signals",
         {
-            "type": "singals.event",
+            "type": "signals.event",
             "taskId": f"{sender.request.id}",
-            "status": "starting",
+            "status": "running",
         },
     )
 
@@ -24,9 +24,9 @@ def task_prerun_handler(sender=None, **kargs) -> None:
 def task_success_handler(sender=None, **kwargs) -> None:
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
-        "singals",
+        "signals",
         {
-            "type": "singals.event",
+            "type": "signals.event",
             "taskId": f"{sender.request.id}",
             "status": "successful",
         },

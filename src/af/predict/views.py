@@ -4,6 +4,8 @@ from celery.result import AsyncResult
 from core.celery import celery_handler
 from django.http.response import JsonResponse
 from rest_framework.decorators import api_view
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from .tasks import af_predictions, test_af_predictions
 
