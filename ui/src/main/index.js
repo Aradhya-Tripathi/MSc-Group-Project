@@ -1,6 +1,7 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { app, BrowserWindow, ipcMain, MessageChannelMain, shell } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { dialog } from 'electron'
 
 function createWindow() {
   // Create the browser window.
@@ -9,7 +10,7 @@ function createWindow() {
     height: 670,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}), // Fix this icon issue for MacOS
+    // ...(process.platform === 'linux' ? { icon } : {}), // Fix this icon issue for MacOS
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -18,6 +19,23 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+  })
+
+  mainWindow.on('close', (event) => {
+    let response = dialog.showMessageBoxSync(mainWindow, {
+      title: 'Confirm Closing',
+      type: 'info',
+      buttons: ['Leave', 'Stay'],
+      defaultId: 1,
+      message: 'Closing Confirmation',
+      detail: 'Closing the application will remove all scheduled/exeuting jobs.',
+      icon: '/Users/aradhya/Desktop/Uni-Projects/group-project/ui/resources/icon.png'
+    })
+    if (response === 1) event.preventDefault()
+    else {
+      mainWindow.webContents.send('closing')
+      app.exit(0)
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -32,7 +50,9 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+  return mainWindow
 }
+ipcMain.on('ping', () => console.log('pong'))
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -48,10 +68,27 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  const mainWindow = createWindow()
 
-  createWindow()
+  // Custom Messages
+  ipcMain.on('query-selector', () => {
+    let filePath = dialog.showOpenDialogSync(mainWindow, {
+      title: 'Select query file',
+      message: 'Selected file will be used as input to the model',
+      properties: ['openFile'],
+      filters: [{ name: 'CSV Files', extensions: ['csv'] }]
+    })
+    mainWindow.webContents.send('query-selector-results', { filePath: filePath })
+  })
+
+  ipcMain.on('model-selector', () => {
+    let filePath = dialog.showOpenDialogSync(mainWindow, {
+      title: 'Select query file',
+      message: 'Selected file will be used as input to the model',
+      properties: ['openDirectory']
+    })
+    mainWindow.webContents.send('model-selector-results', { filePath: filePath })
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -69,5 +106,4 @@ app.on('window-all-closed', () => {
   }
 })
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+app.dock.setIcon(join(__dirname, '../../resources/icon.png'))
