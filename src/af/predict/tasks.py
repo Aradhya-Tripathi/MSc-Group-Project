@@ -1,21 +1,55 @@
 import os
 
 from celery import shared_task
-
+from celery.signals import task_prerun, task_success
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from .predictions.predict import Predict
 
 
-@shared_task
-def af_predictions():
-    Predict(
-        "/Users/aradhya/Desktop/Uni-Projects/group-project/src/queries.csv",
-        "/Users/aradhya/Desktop/Uni-Projects/group-project/src/colabparams",
-    ).run()
+def revoke_tasks(task_ids: list[str]) -> None:
+    from core.celery import celery_handler
+
+    # Revoke and terminate the worker child process executing the task
+    celery_handler.control.revoke(task_ids, terminate=True)
+
+
+@task_prerun.connect
+def task_prerun_handler(sender=None, **kargs) -> None:
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "signals",
+        {
+            "type": "signals.event",
+            "taskId": f"{sender.request.id}",
+            "status": "running",
+        },
+    )
+
+
+@task_success.connect
+def task_success_handler(sender=None, **kwargs) -> None:
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "signals",
+        {
+            "type": "signals.event",
+            "taskId": f"{sender.request.id}",
+            "status": "successful",
+        },
+    )
 
 
 @shared_task
-def test_af_predictions() -> bool:
+def af_predictions(query_path, colabparams):
+    Predict(query_path, colabparams).run()
+
+
+@shared_task
+def test_af_predictions(query_path, colabparams) -> bool:
     import time
+
+    print(query_path, colabparams)
 
     time.sleep(30)
     return True
