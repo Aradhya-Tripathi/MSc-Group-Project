@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_plotly_dash.apps.DjangoPlotlyDashConfig",  # For simpler molecule render!
     "rest_framework",
     "corsheaders",
     "predict",
+    "render",
 ]
 
 MIDDLEWARE = [
@@ -145,6 +147,9 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+# Plotly/Dash settings.
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 
 # Internationalization

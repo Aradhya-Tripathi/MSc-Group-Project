@@ -4,3 +4,4 @@ __pycache__
 */results
 *queries.csv
 env/
+out/
