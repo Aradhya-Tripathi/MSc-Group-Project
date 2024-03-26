@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_plotly_dash.apps.DjangoPlotlyDashConfig",  # For simpler molecule render!
     "rest_framework",
     "corsheaders",
     "predict",
+    "render",
 ]
 
 MIDDLEWARE = [
@@ -146,6 +148,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Plotly/Dash settings.
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -163,6 +168,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

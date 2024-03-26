@@ -6,7 +6,6 @@ import Setup from './components/Setup'
 import QueuedPredictions from './components/QueuedPredictions'
 
 function App() {
-  // Todo: https://www.bugpilot.com/guides/en/building-a-chat-application-with-react-and-django-channels-0120
   // to show changes in the prediction state.
   const [queue, setQueue] = useState({})
   const [isConnected, setIsConnected] = useState(true)
@@ -25,18 +24,23 @@ function App() {
   }
 
   signalsWebsocket.onmessage = (e) => {
+    /*
+    Handle server messages handle different types of messages.
+    */
     var message = JSON.parse(e.data)
     if (message.error != undefined) {
       toast.error(message.error)
       return
     }
-    setQueue(message.tasks)
+    if (message.tasks) {
+      setQueue(message.tasks)
+    }
   }
 
   const querySetup = () => {
     /*
      Handle query setup and trigger prediction
-     */
+    */
     window.electron.ipcRenderer.send('query-selector')
     window.electron.ipcRenderer.on('query-selector-results', (_, msg) => {
       if (msg.filePath === undefined) return
@@ -56,23 +60,6 @@ function App() {
         <>
           <header className="text-white font-bold text-2xl mt-5">LocalFold</header>
           {toggleSetup && <Setup toggleSetup={toggleSetup} setToggleSetup={setToggleSetup} />}
-          {/* <div className="w-screen flex items-center justify-center">
-            <input
-              type="text"
-              className="mt-10 rounded-l text-center border-b-1 focus:outline-none w-3/6 text-black bg-[#FAF9F6] rounded-lg"
-              placeholder="Path to query file"
-              value={queryPath}
-              onChange={(e) => {
-                setQueryPath(e.target.value)
-              }}
-            />
-          </div> */}
-          {/* <button
-            className="text-white bg-transparent mt-2 mb-2 hover:text-gray-200"
-            onClick={enqueuePrediction}
-          >
-            Queue Prediction
-          </button> */}
           <QueuedPredictions queue={queue} />
         </>
       ) : (

@@ -4,7 +4,6 @@ import { join } from 'path'
 import { dialog } from 'electron'
 
 function createWindow() {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
@@ -19,23 +18,6 @@ function createWindow() {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
-  })
-
-  mainWindow.on('close', (event) => {
-    let response = dialog.showMessageBoxSync(mainWindow, {
-      title: 'Confirm Closing',
-      type: 'info',
-      buttons: ['Leave', 'Stay'],
-      defaultId: 1,
-      message: 'Closing Confirmation',
-      detail: 'Closing the application will remove all scheduled/exeuting jobs.',
-      icon: '/Users/aradhya/Desktop/Uni-Projects/group-project/ui/resources/icon.png'
-    })
-    if (response === 1) event.preventDefault()
-    else {
-      mainWindow.webContents.send('closing')
-      app.exit(0)
-    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -69,6 +51,24 @@ app.whenReady().then(() => {
   })
 
   const mainWindow = createWindow()
+  // Custom Event Handlers
+
+  mainWindow.on('close', (event) => {
+    let response = dialog.showMessageBoxSync(mainWindow, {
+      title: 'Confirm Closing',
+      type: 'info',
+      buttons: ['Leave', 'Stay'],
+      defaultId: 1,
+      message: 'Closing Confirmation',
+      detail: 'Closing the application will remove all scheduled/exeuting jobs.',
+      icon: '/Users/aradhya/Desktop/Uni-Projects/group-project/ui/resources/icon.png'
+    })
+    if (response === 1) event.preventDefault()
+    else {
+      mainWindow.webContents.send('closing')
+      app.exit(0)
+    }
+  })
 
   // Custom Messages
   ipcMain.on('query-selector', () => {
@@ -83,11 +83,20 @@ app.whenReady().then(() => {
 
   ipcMain.on('model-selector', () => {
     let filePath = dialog.showOpenDialogSync(mainWindow, {
-      title: 'Select query file',
-      message: 'Selected file will be used as input to the model',
+      title: 'Select Model Parameters',
+      message: 'Selected directory will be use to set parameters for model inference',
       properties: ['openDirectory']
     })
     mainWindow.webContents.send('model-selector-results', { filePath: filePath })
+  })
+
+  ipcMain.on('results-dir-selector', () => {
+    let filePath = dialog.showOpenDialogSync(mainWindow, {
+      title: 'Select Results Direcotry',
+      message: 'Model predictions will be save in this directory',
+      properties: ['openDirectory']
+    })
+    mainWindow.webContents.send('results-dir-results', { filePath: filePath })
   })
 
   app.on('activate', function () {

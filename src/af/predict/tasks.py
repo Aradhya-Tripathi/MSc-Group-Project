@@ -41,15 +41,20 @@ def task_success_handler(sender=None, **kwargs) -> None:
 
 
 @shared_task
-def af_predictions(query_path, colabparams):
-    Predict(query_path, colabparams).run()
+def af_predictions(query_path: str, model_options: dict[str, str]) -> None:
+    Predict(
+        query_path,
+        model_type=model_options["modelType"],
+        path_to_params=model_options["modelPath"],
+        path_to_results_dir=model_options["resultPath"],
+    ).run()
 
 
 @shared_task
-def test_af_predictions(query_path, colabparams) -> bool:
+def test_af_predictions(query_path, model_options) -> bool:
     import time
 
-    print(query_path, colabparams)
+    print(query_path, model_options)
 
     time.sleep(30)
     return True

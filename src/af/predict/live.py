@@ -1,6 +1,5 @@
 import json
-import os
-import signal
+
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
@@ -8,9 +7,11 @@ from .tasks import af_predictions, revoke_tasks, test_af_predictions
 
 
 class SignalsConsumer(JsonWebsocketConsumer):
+    """Single consumer for triggering actions & receiving updates about the the action."""
+
     groups = ["signals"]
     tasks: dict[str, str] = {}
-    colabparams: str = None
+    model_options: dict[str, str] = {}
 
     @classmethod
     def decode_json(cls, text_data):
@@ -29,13 +30,15 @@ class SignalsConsumer(JsonWebsocketConsumer):
     def disconnect(self, close_code: int) -> None:
         """Disconnect handler"""
         async_to_sync(self.channel_layer.group_discard)(
-            "signals", self.channel_name
-        )  # Removing this consumer from the group on disconnect!
+            "signals",
+            self.channel_name,
+        )
         # If the socket gets disconnected we will revoke all tasks since this means
         # the application is closing I don't know how I feel about this however 🤔
         revoke_tasks(list(self.tasks.keys()))
         self.tasks = {}
 
+        # Shut down the server when app is closed we don't want hanging servers
         print(f"Disconnected with close code: {close_code}")
         print("Shutting Down...")
 
@@ -49,7 +52,7 @@ class SignalsConsumer(JsonWebsocketConsumer):
             return
         to_execute = content["execute"]
         arg = content.get("arg")
-        # Fetch the method
+
         try:
             to_execute = getattr(self, to_execute)
         except AttributeError:
@@ -57,31 +60,33 @@ class SignalsConsumer(JsonWebsocketConsumer):
                 {"error": "No such execution context!"},
             )
             return
-        # Execute the method
+
         try:
             to_execute(arg)
         except Exception as e:
             print(e)
             self.send_json({"error": str(e)})
 
-    def set_model_path(self, path: str) -> None:
-        self.colabparams = path
+    def set_model_options(self, options: dict[str, str]) -> None:
+        """Set model options for excution"""
+        self.model_options = options
 
     def add_task(self, query_path: str) -> None:
         """Task addition handler"""
-        if len(self.tasks) > 10:  # Not showing more than 10 tasks
-            self.tasks = (
-                {}
-            )  # Figure this out there should be a better way of handling this!
 
-        if not self.colabparams:
+        if (
+            "modelType" not in self.model_options
+            or "modelPath" not in self.model_options
+            or "resultPath" not in self.model_options
+        ):
             self.send_json({"error": "Setup not complete!"})
             return
 
-        job = test_af_predictions.delay(
-            query_path, self.colabparams
+        # Figure out how to stop plot displays we don't
+        # Need them in this case since it's all run by a worker
+        test_af_predictions.delay(
+            query_path, self.model_options
         )  # Pre-run handler takes care of sending confirmation!
-        self.tasks[job.id] = "unknown"
 
     def signals_event(self, event: dict[str, str]) -> None:
         """Events handler"""
