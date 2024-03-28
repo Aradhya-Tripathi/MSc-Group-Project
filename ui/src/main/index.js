@@ -1,7 +1,9 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, ipcMain, MessageChannelMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { join } from 'path'
-import { dialog } from 'electron'
+
+// const childProcess = require('child_process').execFile
+const pathToAvogadro = '/opt/homebrew/Caskroom/avogadro/1.99.0/Avogadro2.app'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -97,6 +99,11 @@ app.whenReady().then(() => {
       properties: ['openDirectory']
     })
     mainWindow.webContents.send('results-dir-results', { filePath: filePath })
+  })
+
+  ipcMain.on('clicked-prediction', (event, msg) => {
+    console.log(msg.resultDestination)
+    shell.openPath(pathToAvogadro) // It would be so cool if I can have the results dir already open in this app
   })
 
   app.on('activate', function () {
