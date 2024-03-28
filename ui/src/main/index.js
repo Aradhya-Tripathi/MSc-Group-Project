@@ -1,9 +1,7 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { join } from 'path'
-
-// const childProcess = require('child_process').execFile
-const pathToAvogadro = '/opt/homebrew/Caskroom/avogadro/1.99.0/Avogadro2.app'
+import { exec } from 'child_process'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -102,8 +100,9 @@ app.whenReady().then(() => {
   })
 
   ipcMain.on('clicked-prediction', (event, msg) => {
-    console.log(msg.resultDestination)
-    shell.openPath(pathToAvogadro) // It would be so cool if I can have the results dir already open in this app
+    exec(`pymol ${msg.resultDestination}/*.pdb`, (err, stdout, stderr) => {
+      console.log(stdout)
+    })
   })
 
   app.on('activate', function () {
