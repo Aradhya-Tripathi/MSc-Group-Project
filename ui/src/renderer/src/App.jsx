@@ -1,15 +1,28 @@
 import { useState } from 'react'
-import { signalsWebsocket } from './Api'
+import { signalsWebsocket, dataApi } from './Api'
 import { Toaster, toast } from 'sonner'
 
 import Setup from './components/Setup'
 import QueuedPredictions from './components/QueuedPredictions'
 
-function App() {
+const App = () => {
   // to show changes in the prediction state.
-  const [queue, setQueue] = useState({})
+  const [queue, setQueue] = useState([])
   const [isConnected, setIsConnected] = useState(true)
   const [toggleSetup, setToggleSetup] = useState(false)
+
+  const fetchTasks = () => {
+    dataApi
+      .get('/get-tasks')
+      .then((response) => {
+        if (response.status === 200) {
+          setQueue(response.data.tasks)
+        }
+      })
+      .catch(() => {
+        toast.error('Error occured in fetching tasks!')
+      })
+  }
 
   window.electron.ipcRenderer.on('closing', () => {
     signalsWebsocket.close(1000) //  closing websocket connection as soon as window is closed!
@@ -20,21 +33,22 @@ function App() {
   }
 
   signalsWebsocket.onopen = (e) => {
-    toast.success('Connected!')
+    // Fetch all tasks will add pagination later
+    // as soon as the websocket is opened that means we are ready to
+    // recieve updates therefore fetch tasks.
+    fetchTasks()
   }
 
-  signalsWebsocket.onmessage = (e) => {
-    /*
-    Handle server messages handle different types of messages.
-    */
-    var message = JSON.parse(e.data)
-    if (message.error != undefined) {
-      toast.error(message.error)
-      return
-    }
-    if (message.tasks) {
-      setQueue(message.tasks)
-    }
+  signalsWebsocket.onclose = () => {
+    toast.error('Disconnected!')
+  }
+
+  signalsWebsocket.onmessage = (message) => {
+    // Recieve the task that has been updated
+    // However we don't know how to change the queue directly yet
+    // therefore fetching all the tasks again!
+    var message = JSON.parse(message.data)
+    fetchTasks()
   }
 
   const querySetup = () => {

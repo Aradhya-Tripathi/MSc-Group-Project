@@ -20,6 +20,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@jowillianto/ngl-viewer": "github:jowillianto/ngl-viewer#stable",
     "axios": "^1.6.8",
     "electron-updater": "^6.1.7",
     "sonner": "^1.4.41"

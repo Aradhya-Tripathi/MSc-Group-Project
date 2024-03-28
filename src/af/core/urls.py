@@ -16,10 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
+from predict.live import get_tasks
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("plots", include("django_plotly_dash.urls")),
-    path("render/", include("render.urls")),
+    path("get-tasks", get_tasks),
+    path("get-tasks/<str:taskId>", get_tasks),
 ]

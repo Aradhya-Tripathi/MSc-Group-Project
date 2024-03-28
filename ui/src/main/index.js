@@ -1,7 +1,7 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, ipcMain, MessageChannelMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import { join } from 'path'
-import { dialog } from 'electron'
+import { exec } from 'child_process'
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -97,6 +97,12 @@ app.whenReady().then(() => {
       properties: ['openDirectory']
     })
     mainWindow.webContents.send('results-dir-results', { filePath: filePath })
+  })
+
+  ipcMain.on('clicked-prediction', (event, msg) => {
+    exec(`pymol ${msg.resultDestination}/*.pdb`, (err, stdout, stderr) => {
+      console.log(stdout)
+    })
   })
 
   app.on('activate', function () {

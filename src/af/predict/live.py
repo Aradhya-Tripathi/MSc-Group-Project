@@ -2,16 +2,21 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
+from django.http.response import JsonResponse
 
-from .tasks import af_predictions, revoke_tasks, test_af_predictions
+from .models import Tasks
+
+from .tasks import af_predictions, test_af_predictions
 
 
 class SignalsConsumer(JsonWebsocketConsumer):
     """Single consumer for triggering actions & receiving updates about the the action."""
 
     groups = ["signals"]
-    tasks: dict[str, str] = {}
-    model_options: dict[str, str] = {}
+    model_options: dict[str, str] = (
+        {}
+    )  # Since they are not likely to change per perdiction
+    # However they can be changed using set_model_options
 
     @classmethod
     def decode_json(cls, text_data):
@@ -22,6 +27,7 @@ class SignalsConsumer(JsonWebsocketConsumer):
 
     def connect(self) -> None:
         """Connection handler"""
+        print(f"Connecting client")
         async_to_sync(self.channel_layer.group_add)(
             "signals", self.channel_name
         )  # I can add multiple consumers to this group and then broadcast!
@@ -35,8 +41,7 @@ class SignalsConsumer(JsonWebsocketConsumer):
         )
         # If the socket gets disconnected we will revoke all tasks since this means
         # the application is closing I don't know how I feel about this however 🤔
-        revoke_tasks(list(self.tasks.keys()))
-        self.tasks = {}
+        # revoke_tasks(list(self.tasks.keys()))
 
         # Shut down the server when app is closed we don't want hanging servers
         print(f"Disconnected with close code: {close_code}")
@@ -80,7 +85,7 @@ class SignalsConsumer(JsonWebsocketConsumer):
             or "resultPath" not in self.model_options
         ):
             self.send_json({"error": "Setup not complete!"})
-            return
+            # testing so not returning
 
         # Figure out how to stop plot displays we don't
         # Need them in this case since it's all run by a worker
@@ -89,8 +94,36 @@ class SignalsConsumer(JsonWebsocketConsumer):
         )  # Pre-run handler takes care of sending confirmation!
 
     def signals_event(self, event: dict[str, str]) -> None:
-        """Events handler"""
-        self.tasks[event["taskId"]] = event[
-            "status"
-        ]  # update task status when event is recieved
-        self.send_json(content={"tasks": self.tasks})
+        """Let the client know about the changed task"""
+        self.send_json({"modifiedTask": event["taskId"]})
+
+
+def get_tasks(request, taskId: str = None):
+    """For now sending all the tasks will add pagination later!"""
+    if taskId:
+        task = Tasks.objects.get(pk=taskId)
+        return JsonResponse(
+            {
+                "taskId": task.task_id,
+                "registrationTime": task.registration_time,
+                "resultDestination": task.result_destination,
+                "taskStatus": task.task_status,
+                "queriesPath": task.queries_path,
+                "modelParameters": task.model_settings["modelPath"],
+            },
+            status=200,
+        )
+
+    tasks = [
+        {
+            "taskId": task.task_id,
+            "registrationTime": task.registration_time,
+            "resultDestination": task.result_destination,
+            "taskStatus": task.task_status,
+            "queriesPath": task.queries_path,
+            "modelParameters": task.model_settings["modelPath"],
+        }
+        for task in Tasks.objects.all()
+    ]
+
+    return JsonResponse({"tasks": tasks}, status=200)
