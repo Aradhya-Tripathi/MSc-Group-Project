@@ -66,6 +66,7 @@ class Predict:
             result_dir=self.path_to_results_dir,
             num_models=kwargs.get("num_models", 5),
             data_dir=self.path_to_params,
+            user_agent="af-predictions/localfold",
             *kwargs,
         )
         print("Finished running model")

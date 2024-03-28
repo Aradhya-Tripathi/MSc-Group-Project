@@ -4,8 +4,7 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
-        'main-background':
-          "url('/Users/aradhya/Desktop/Uni-Projects/group-project/AF-Desktop-Predictions/src/renderer/src/assets/background.jpg')"
+        'main-background': 'src/renderer/src/assets/background.jpg'
       }
     }
   },

@@ -4,3 +4,6 @@ __pycache__
 */results
 *queries.csv
 env/
+out/
+src/af/db.sqlite3
+.DS_Store

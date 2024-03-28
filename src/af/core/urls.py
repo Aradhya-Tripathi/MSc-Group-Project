@@ -16,6 +16,11 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from predict.live import get_tasks
 
-urlpatterns = [path("admin/", admin.site.urls), path("", include("predict.urls"))]
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("get-tasks", get_tasks),
+    path("get-tasks/<str:taskId>", get_tasks),
+]
