@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "group-project"
+name = "localfold"
 version = "0.1.0"
 description = ""
 authors = ["Aradhya Tripathi <67282231+Aradhya-Tripathi@users.noreply.github.com>"]
@@ -18,9 +18,12 @@ django-cors-headers = "^4.3.1"
 channels = "^4.0.0"
 daphne = "^4.1.0"
 channels-redis = "^4.2.0"
-
-[tool.poetry.group.dev.dependencies]
+fire = "^0.6.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+localfold = 'localfold.cli:main'
