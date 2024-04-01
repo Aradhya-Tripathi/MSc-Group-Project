@@ -27,8 +27,8 @@ class Manager:
         with open(self.config_path, "w+") as f:
             self.config.write(f)
 
-    def start_django(self) -> None:
-        """Start django processing server"""
+    def start_server(self) -> None:
+        """Start django and celery processing server"""
 
         if self.config.has_option("DJANGO", "pid"):
             print("Django server is running!")
@@ -48,7 +48,6 @@ class Manager:
         self.config["DJANGO"]["pid"] = str(process.pid)
         self.save_config()
 
-    def start_celery(self) -> None:
         if self.config.has_option("CELERY", "pid"):
             print("Celery server is running!")
             return
@@ -71,10 +70,9 @@ class Manager:
         self.save_config()
 
     def start_client(self) -> None:
-        """Currently starting the client using dev"""
+        """Boot up client server after triggering django and celery startup."""
         check_server = True
-        self.start_django()
-        self.start_celery()
+        self.start_server()
 
         while check_server:
             try:
@@ -143,12 +141,11 @@ def main():
     manager = Manager()
     fire.Fire(
         {
-            # "start-django": manager.start_django,
             "kill-django": manager.kill_django,
-            # "start-celery": manager.start_celery,
             "kill-celery": manager.kill_celery,
             "clear-logs": manager.clear_logs,
             "start-client": manager.start_client,
+            "start-server": manager.start_server,
             "kill-all": manager.kill_all,
             "list": manager.list,
         }
