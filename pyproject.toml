@@ -8,8 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
-colabfold = {git = "git@github.com:sokrypton/ColabFold.git", rev = "main", extras = ["alphafold"]}
-requests = "^2.31.0"
+colabfold = {git = "git@github.com:sokrypton/ColabFold.git", rev = "61df3b8", extras = ["alphafold"]}
 redis = "^5.0.3"
 celery = "^5.3.6"
 django = "^5.0.3"
@@ -19,6 +18,9 @@ channels = "^4.0.0"
 daphne = "^4.1.0"
 channels-redis = "^4.2.0"
 fire = "^0.6.0"
+
+[tool.poetry.group.dev.dependencies]
+requests = "^2.31.0"
 
 [build-system]
 requires = ["poetry-core"]
