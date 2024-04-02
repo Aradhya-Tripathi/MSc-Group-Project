@@ -71,20 +71,22 @@ def main():
     parser = argparse.ArgumentParser(
         description="Installation script for easy install."
     )
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument(
+        "--verbose", action="store_true", default=True, help="Enable verbose output"
+    )
     parser.add_argument(
         "--make-env",
-        dest="use_env",
+        dest="make_env",
         action="store_true",
-        help="Do not use virtual environment",
+        help="Make a new virtual environment if not in one",
     )
     parser.add_argument(
         "--dir",
         default="./localfold-installation",
-        help="Directory to install (default: current directory)",
+        help="Directory to install (default: ./localfold-installation)",
     )
     args = parser.parse_args()
-    installer = Installer(verbose=args.verbose, use_env=args.use_env, dir=args.dir)
+    installer = Installer(verbose=args.verbose, use_env=args.make_env, dir=args.dir)
     installer.install()
 
 
