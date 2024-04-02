@@ -2,6 +2,7 @@ import configparser
 import os
 import shlex
 import subprocess
+import sys
 
 import fire
 import requests
@@ -38,9 +39,10 @@ class Manager:
         django_error = open("./log-error-django.log", "w+")
 
         process = subprocess.Popen(
-            shlex.split("python server/manage.py runserver"),
+            shlex.split("./django_startup.sh"),
             stdout=django_out,
             stderr=django_error,
+            cwd="./server",
         )
         if not self.config.has_section("DJANGO"):
             self.config.add_section("DJANGO")
@@ -56,9 +58,7 @@ class Manager:
         celery_error = open("./log-error-celery.log", "w+")
 
         process = subprocess.Popen(
-            shlex.split(
-                "celery -A core worker --pool=prefork --loglevel=INFO -n AF-Predictions -Q AF-Predictions-Queue"
-            ),
+            "./celery_startup.sh",
             stdout=celery_out,
             stderr=celery_error,
             cwd="./server",

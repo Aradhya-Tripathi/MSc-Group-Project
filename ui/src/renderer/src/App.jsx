@@ -19,7 +19,8 @@ const App = () => {
           setQueue(response.data.tasks)
         }
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e)
         toast.error('Error occured in fetching tasks!')
       })
   }

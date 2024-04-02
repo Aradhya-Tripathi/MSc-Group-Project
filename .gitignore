@@ -5,5 +5,5 @@ __pycache__
 *queries.csv
 env/
 out/
-src/af/db.sqlite3
+*.sqlite*
 .DS_Store

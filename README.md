@@ -20,6 +20,12 @@ To tackle this problem, we've developed a desktop application that leverages Ele
 - Background job processing with Celery.
 - Visualization of predicted protein structures using PyMOL.
 
+## Images
+
+![Screenshot 1](./localfold/docs/model-prediction.png)
+
+<!-- ![Screenshot 2](path/to/screenshot2.png) -->
+
 ## Installation
 
 1. Clone this repository.

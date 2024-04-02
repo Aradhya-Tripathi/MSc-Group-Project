@@ -15,6 +15,9 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
+    server: {
+      port: 5000
+    },
     plugins: [react()]
   }
 })
