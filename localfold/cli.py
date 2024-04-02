@@ -2,7 +2,6 @@ import configparser
 import os
 import shlex
 import subprocess
-import sys
 
 import fire
 import requests
