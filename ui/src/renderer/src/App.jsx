@@ -19,7 +19,8 @@ const App = () => {
           setQueue(response.data.tasks)
         }
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e)
         toast.error('Error occured in fetching tasks!')
       })
   }
@@ -77,7 +78,7 @@ const App = () => {
           <QueuedPredictions queue={queue} />
         </>
       ) : (
-        <h1 className="text-center text-3xl font-bold text-red-600">Server offline!</h1>
+        <h1 className="text-center text-3xl font-bold text-red-600">Server offline restart app!</h1>
       )}
       <nav className=" h-10 w-full flex justify-center">
         <button
