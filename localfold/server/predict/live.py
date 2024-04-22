@@ -6,6 +6,8 @@ from django.http.response import JsonResponse
 
 from .models import Tasks
 
+# Commnected out to facilitate fast predictions.
+# In prod switch to af_predictions and not test_aaf_predictions.
 from .tasks import af_predictions, test_af_predictions
 
 
