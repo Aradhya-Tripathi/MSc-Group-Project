@@ -87,7 +87,7 @@ class SignalsConsumer(JsonWebsocketConsumer):
             or "resultPath" not in self.model_options
         ):
             self.send_json({"error": "Setup not complete!"})
-            # testing so not returning
+            return
 
         # Figure out how to stop plot displays we don't
         # Need them in this case since it's all run by a worker
