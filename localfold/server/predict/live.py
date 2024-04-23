@@ -6,6 +6,8 @@ from django.http.response import JsonResponse
 
 from .models import Tasks
 
+# Commnected out to facilitate fast predictions.
+# In prod switch to af_predictions and not test_aaf_predictions.
 from .tasks import af_predictions, test_af_predictions
 
 
@@ -85,7 +87,7 @@ class SignalsConsumer(JsonWebsocketConsumer):
             or "resultPath" not in self.model_options
         ):
             self.send_json({"error": "Setup not complete!"})
-            # testing so not returning
+            return
 
         # Figure out how to stop plot displays we don't
         # Need them in this case since it's all run by a worker
