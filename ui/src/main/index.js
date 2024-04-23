@@ -120,5 +120,3 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
-app.dock.setIcon(join(__dirname, '../../resources/icon.png'))
