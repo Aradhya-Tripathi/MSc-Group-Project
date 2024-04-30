@@ -16,7 +16,7 @@ django-cors-headers = "^4.3.1"
 channels = "^4.0.0"
 daphne = "^4.1.0"
 channels-redis = "^4.2.0"
-colabfold = {git = "git@github.com:sokrypton/ColabFold.git", branch = "main", extras = ["alphafold"]}
+colabfold = {git = "https://github.com/sokrypton/ColabFold.git", branch = "main", extras = ["alphafold"]}
 
 [tool.poetry.group.dev.dependencies]
 requests = "^2.31.0"
