@@ -7,7 +7,7 @@ from celery import shared_task
 from celery.signals import task_prerun, task_success
 from channels.layers import get_channel_layer
 
-from .predictions.predict import Predict
+from localfold.predictions.predict import Predict
 
 
 def revoke_tasks(task_ids: list[str]) -> None:
@@ -84,11 +84,11 @@ def test_af_predictions(query_path, model_options) -> bool:
     return True
 
 
-# ref: https://github.com/celery/celery/issues/6036
-os.environ["FORKED_BY_MULTIPROCESSING"] = "1"
-if os.name != "nt":
-    from billiard import context
+# # ref: https://github.com/celery/celery/issues/6036
+# os.environ["FORKED_BY_MULTIPROCESSING"] = "1"
+# if os.name != "nt":
+#     from billiard import context
 
-    context._force_start_method(
-        "spawn"
-    )  # 🤯 We need to spawn since our functions are not fork-safe
+#     context._force_start_method(
+#         "spawn"
+#     )  # 🤯 We need to spawn since our functions are not fork-safe

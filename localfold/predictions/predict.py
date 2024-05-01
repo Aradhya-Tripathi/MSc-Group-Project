@@ -1,19 +1,23 @@
 import os
 from pathlib import Path
 
-from colabfold.batch import get_queries, run, set_model_type
+
 from colabfold.download import download_alphafold_params
 
 
 class Model:
     @classmethod
     def setup(cls, is_complex: bool = False, model_type: str = "auto"):
+        from colabfold.batch import set_model_type
+
         return set_model_type(is_complex, model_type)
 
 
 class Input:
     @classmethod
     def setup(cls, path_to_input: str):
+        from colabfold.batch import get_queries
+
         return get_queries(path_to_input)
 
 
@@ -21,7 +25,7 @@ class Predict:
     def __init__(
         self,
         path_to_input: str,
-        path_to_params: str | Path | None = None,
+        path_to_params: str | Path,
         model_type: str = "auto",
         path_to_results_dir: str = ".",
     ) -> None:
@@ -32,13 +36,8 @@ class Predict:
 
         if not self.check_existing_params():
             print(f"Could not find params at {self.path_to_params.absolute()}")
-            download = input("Do you want to download params? y/N: ")
-            if download.casefold() == "y":
-                download_alphafold_params(
-                    model_type=self.model_type, data_dir=self.path_to_params
-                )
-            else:
-                exit()
+
+            exit()
 
         print(
             f"[READY TO PREDICT] using parameters: {self.path_to_params.absolute()} to predict: {path_to_input}"
@@ -53,7 +52,8 @@ class Predict:
         return False
 
     def run(self, **kwargs) -> dict[str, list]:
-        print("Running model this might take some time")
+        from colabfold.batch import run
+
         results = run(
             queries=self.queries,
             is_complex=self.is_complex,
@@ -69,7 +69,6 @@ class Predict:
             user_agent="af-predictions/localfold",
             *kwargs,
         )
-        print("Finished running model")
         return results
 
     def test_run(self):
@@ -78,3 +77,55 @@ class Predict:
 
         time.sleep(10)
         return "Job Completed"
+
+
+def cli():
+    import sys
+
+    if len(sys.argv) > 1:
+        flag = sys.argv[1]
+        match flag:
+            case "--download-parameters":
+                try:
+                    data_dir = sys.argv[2]
+                    model_type = sys.argv[3]
+                except IndexError:
+                    print(
+                        "Please provide all the path to model parameters and the model type!"
+                    )
+                    sys.exit(-1)
+                download_alphafold_params(
+                    model_type=model_type, data_dir=Path(data_dir)
+                )
+            case "--predict":
+                try:
+                    path_to_input = sys.argv[2]
+                    path_to_parameters = sys.argv[3]
+                    path_to_results_dir = sys.argv[4]
+                except IndexError:
+                    print(
+                        "Please provide all the path to model parameters, input and result dirs!"
+                    )
+                    sys.exit(-1)
+
+                try:
+                    model_type = sys.argv[5]
+                except IndexError:
+                    model_type = "auto"
+
+                Predict(
+                    path_to_input=path_to_input,
+                    path_to_params=path_to_parameters,
+                    path_to_results_dir=path_to_results_dir,
+                    model_type=model_type,
+                ).run()
+
+    else:
+        print(
+            "Use the following for downloding the parameters: --download-parameters"
+            "path/to/parameters and model-type or --predict flag"
+        )
+
+
+if __name__ == "__main__":
+    cli()
